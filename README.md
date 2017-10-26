@@ -11,7 +11,7 @@ Generating network age-specific
 - contact distribution (Mossong et al Plos Medicine)
 - contact matrix (Mossong et al Plos Medicine)
 
-```
+```R
 N    <- 1000
 seed <- 123
 ```
@@ -20,7 +20,7 @@ seed <- 123
 
 Assign age: depends on the target population age distribution
 
-```
+```R
   SR             <- dget("./data/SR")  # Sierra Leon population
   if (!is.null(seed)) set.seed(seed)
   age           <- sample(SR$age, N, TRUE, SR$prob)
@@ -29,7 +29,7 @@ Assign age: depends on the target population age distribution
 ```
 
 Assign #contacts: depends on both target age and POLYMOD data
-```
+```R
   agecont      <- orderBy(dget("./data/POLYMODtab1"), 1) # POLYMOD Tab.1
   agecont$rk   <- rank(agecont$age)  # Rank age-group by contact
   POLYMODbreak <- c(0,4,9,14,19,29,39,49,59,69,80) 
@@ -41,14 +41,14 @@ Assign #contacts: depends on both target age and POLYMOD data
 
 Sampling from contact distribution
 
-```
+```R
   distCont <- dget("./data/distCont")
   ncont    <- sort(sample(distCont$freq, N, 1, distCont$prob), TRUE)
 ```
 
 Load contact matrix (as probability) POLYMOD data: averaging all countries
 
-```
+```R
   M <- dget("./data/M")  # image(M)
   Mbrk <- c(0,4,9,14,19,24,29,34,39,44,49,54,59,64,69,70)
   Mnmr <- 1:15
@@ -58,23 +58,23 @@ Load contact matrix (as probability) POLYMOD data: averaging all countries
 
 Run
 
-```
+```R
 source("gennet.R")
 g <- genNet(N, age)
 ```
 
 ## Outputs
 
-```
+```R
 plotNet(g)
 ```
 
-![](g1.png)
+![](./fig/g1.png)
 
 ## Validate
 
 Compare age- and contact-distribution
-```
+```R
 ks.test(age, vertex_attr(g, "age"))
 
 Two-sample Kolmogorov-Smirnov test
