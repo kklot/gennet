@@ -21,7 +21,7 @@ seed <- 123
 Assign age: depends on the target population age distribution
 
 ```
-  SR             <- dget("SR")  # Sierra Leon population
+  SR             <- dget("./data/SR")  # Sierra Leon population
   if (!is.null(seed)) set.seed(seed)
   age           <- sample(SR$age, N, TRUE, SR$prob)
   # add ages 70/80+
@@ -30,7 +30,7 @@ Assign age: depends on the target population age distribution
 
 Assign #contacts: depends on both target age and POLYMOD data
 ```
-  agecont      <- orderBy(dget("POLYMODtab1"), 1) # POLYMOD Tab.1
+  agecont      <- orderBy(dget("./data/POLYMODtab1"), 1) # POLYMOD Tab.1
   agecont$rk   <- rank(agecont$age)  # Rank age-group by contact
   POLYMODbreak <- c(0,4,9,14,19,29,39,49,59,69,80) 
   ageGrp <- cut(age, breaks=POLYMODbreak, include.lowest=1)
@@ -42,14 +42,14 @@ Assign #contacts: depends on both target age and POLYMOD data
 Sampling from contact distribution
 
 ```
-  distCont <- dget("distCont")
+  distCont <- dget("./data/distCont")
   ncont    <- sort(sample(distCont$freq, N, 1, distCont$prob), TRUE)
 ```
 
 Load contact matrix (as probability) POLYMOD data: averaging all countries
 
 ```
-  M <- dget("M")  # image(M)
+  M <- dget("./data/M")  # image(M)
   Mbrk <- c(0,4,9,14,19,24,29,34,39,44,49,54,59,64,69,70)
   Mnmr <- 1:15
   Grp  <- as.numeric(cut(age, breaks=Mbrk, include.lowest=1))
@@ -73,7 +73,7 @@ plotNet(g)
 
 ## Validate
 
-Compare age-distribution
+Compare age- and contact-distribution
 ```
 ks.test(age, vertex_attr(g, "age"))
 
@@ -81,19 +81,20 @@ Two-sample Kolmogorov-Smirnov test
 
 data:  age and vertex_attr(g, "age")
 D = 0, p-value = 1
-alternative hypothesis: two-sided
 
-```
-
-Compare contact-distribution
-```
 ks.test(degree(g), ncont)
 
 Two-sample Kolmogorov-Smirnov test
 
 data:  degree(g) and ncont
 D = 0, p-value = 1
+
+put(1,2)
+qqplot(degree(g), ncont, main="QQ Plot", ylab="Target contact distribution")
+qqplot(age, vertex_attr(g, "age"), main="QQ Plot", ylab="Target age distribution")
 ```
+![](./fig/qqplot.png)
+
 
 Compare contact-matrix
-![](matrixCompare.png)
+![](./fig/matrixCompare.png)
