@@ -14,7 +14,6 @@ genNet <- function(N=N, age=age, n.try=100) {
   makeLinks <- function(i, j) c(sapply(j, function(x) c(i, x)))
   # templates and storages ------------------------------------------------
   g <- make_empty_graph(n = N, directed = FALSE)
-  # g <- set_vertex_attr(g, 'n', value=ncont)
   freeI <- which(ncont > 0) # some might have no contact
   # Main loop -------------------------------------------------------------
   for (i in 1:N) {
@@ -49,4 +48,15 @@ genNet <- function(N=N, age=age, n.try=100) {
   return(g)
 }
 genNet <- compiler::cmpfun(genNet)
-plotNet <- function(M, vs=log(degree(M)+2)*2, vc=vertex_attr(g, "age"), ly=layout_with_fr, ...) plot(g, vertex.size=vs, vertex.label=NA, edge.arrow.mode=0, layout=ly, vertex.color=vc, edge.color="gray90",...) 
+plotNet <- function(g, vs=log(degree(g)+2)*2, vc=vertex_attr(g, "age"), ly=layout_with_fr, ...) plot(g, vertex.size=vs, vertex.label=NA, edge.arrow.mode=0, layout=ly, vertex.color=vc, edge.color="gray90",...) 
+# calculate ro from sims outputs
+# -------------------------------------------------------------------------
+R0net <- function(out = sim, net=g, All=FALSE) {
+    if (class(out$SIR) != "smidSIR") stop("Incompatible")
+    n  <- igraph::delete.vertices(net, which(out$aux == 0))
+    n  <- igraph::as.directed(n, mode = c("arbitrary"))
+    dg <- igraph::degree(n,  mode='out')
+    if (All==TRUE) r0 <- dg
+      else r0 <- mean(dg)
+    return(r0)
+}
